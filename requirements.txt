@@ -1,4 +1,6 @@
 django
 djangorestframework
-djangorestframework-jwt
+djangorestframework-simplejwt
+django-spa
+whitenoise
 pillow
