@@ -1,7 +1,7 @@
-from api.views import UserView
+import api.views as views
 from django.urls import path, include
 
 
 urlpatterns = [
-    path('me/', UserView.as_view()),
+    path('me/', views.UserView.as_view())
 ]

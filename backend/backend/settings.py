@@ -41,10 +41,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'api',
     'rest_framework',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'spa.middleware.SPAMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -132,8 +134,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
     )
 }
 
-# # should really do this properly later
-# CORS_ORIGIN_ALLOW_ALL = True
+# should really do this properly later
+CORS_ORIGIN_ALLOW_ALL = True
