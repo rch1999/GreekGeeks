@@ -1,6 +1,10 @@
 django
 djangorestframework
 djangorestframework-simplejwt
+django-cors-headers
+django-filter
 django-spa
 whitenoise
 pillow
+uritemplate
+pyyaml

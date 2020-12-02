@@ -1,0 +1,105 @@
+openapi: 3.0.3
+info:
+  title: GreekGeeks API
+  version: '1.0'
+  description: ''
+  x-logo:
+    url: ''
+  license: null
+  contact: null
+paths:
+  '/organizations/{orgId}/contacts':
+    get:
+      tags: []
+      operationId: get-organization-contacts
+      summary: Get a list of all organization contacts
+    post:
+      tags: []
+      operationId: add-organization-contact
+      summary: Add a new contact to an organization
+    x-last-modified: 1606781402472
+  '/organizations/{orgId}/contacts/{contactId}':
+    get:
+      tags: []
+      operationId: get-organization-contact
+      summary: Get an organization contact
+    post:
+      tags: []
+      operationId: update-organization-contact
+      summary: Update an organization's contact
+    delete:
+      tags: []
+      operationId: delete-organization-contact
+      summary: Delete an organization contact
+    x-last-modified: 1606781425400
+  '/organizations/{orgId}/contacts/{contactId}/notes/{noteId}':
+    delete:
+      tags: []
+      operationId: delete-contact-note
+      summary: Delete a contact note
+    x-last-modified: 1606781456677
+  '/organizations/{orgId}/members':
+    get:
+      tags: []
+      operationId: get-organization-members
+      summary: Get all of an organization's members
+    post:
+      tags: []
+      operationId: add-organization-member
+      summary: Add a new organization member
+    x-last-modified: 1606781477596
+  '/organizations/{orgId}/members/{memberId}':
+    get:
+      tags: []
+    delete:
+      tags: []
+      operationId: delete-organization-member
+      summary: Delete an organization member
+    x-last-modified: 1606781503669
+  '/organizations/{orgId}/requests':
+    get:
+      tags: []
+    post:
+      tags: []
+    x-last-modified: 1606781533619
+  '/organizations/{orgId}/requests/{requestId}':
+    get:
+      tags: []
+    post:
+      tags: []
+    delete:
+      tags: []
+    x-last-modified: 1606781579238
+  /users:
+    post:
+      description: ''
+    x-last-modified: 1606781597408
+  '/users/{userId}':
+    get:
+      description: ''
+    post:
+      description: ''
+    delete:
+      description: ''
+    x-last-modified: 1606781607142
+  '/users/{userId}/notifications':
+    get:
+      description: ''
+    post:
+      description: ''
+    x-last-modified: 1606781643091
+  '/users/{userId}/notifications/{notificationId}':
+    get:
+      tags: []
+    delete:
+      tags: []
+    x-last-modified: 1606781758327
+components:
+  securitySchemes: {}
+  schemas: {}
+  responses: {}
+  parameters: {}
+tags: []
+servers: []
+security: []
+externalDocs: null
