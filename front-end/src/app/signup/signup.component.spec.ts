@@ -5,7 +5,7 @@ import { SignupComponent } from './signup.component';
 
 describe('SignupComponent', () => {
   let component: SignupComponent;
-  let backend: ApiService
+  let backend: ApiService // so we can access our backend from our test suite
   let fixture: ComponentFixture<SignupComponent>;
 
   beforeEach(async(() => {
@@ -33,6 +33,7 @@ describe('SignupComponent', () => {
   4. Upon successful sign up, our backend will have 1 new user
   */
 
+  // make sure our signup component is created properly
   it('should create', () => {
     expect(component).toBeTruthy();
   });
@@ -60,11 +61,10 @@ describe('SignupComponent', () => {
   it('should allow sign up on valid credentials', () => {
     let numusers: number = backend.getUsers().length;
 
-    /* later this will be made far more secure */
+    /* valid combination of credentials */
     component.email = "zacharydward12@gmail.com";
     component.password = "admin1234!";
     component.displayName = "zacharydw"
-    /* ^^^ this will be further encoded */
 
     try {
       component.signUp();
@@ -91,7 +91,7 @@ describe('SignupComponent', () => {
     }
     expect(backend.getUsers().length === numusers).toBeTruthy(); // no users added to backend.
 
-    /* change password to be longer than 6 characters but missing a symbol */
+    // change password to be longer than 6 characters but missing a symbol
     component.password = "password";
     try {
       component.signUp();
@@ -103,7 +103,7 @@ describe('SignupComponent', () => {
 
   // make sure signing up doesn't work with a taken displayName
   it('should prevent a user signing up with a taken display name', () => {
-    /* get a username that is already in use */
+    // get a username that is already in use 
     let usedName: string = backend.getUsers()[0].username;
 
     component.email = "zacharydward12@gmail.com";

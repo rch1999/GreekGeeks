@@ -7,6 +7,9 @@ import { User } from '../models/user.model';
     providedIn: 'root'
 })
 export class ApiService {
+    findOrganizationByName(name: any): any {
+      throw new Error('Method not implemented.');
+    }
     /* [FOR TESTING]: clears all users from the database */
     clearUsers() {
       throw new Error('Method not implemented.');

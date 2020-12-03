@@ -23,6 +23,13 @@ describe('LoginComponent', () => {
     backend.clearUsers(); 
   });
 
+/* 
+  RULES for the login page (tests were based on this):
+  1. You cannot login with an email not in our records.
+  2. Your password must match a record corresponding to the email.
+  3. Failure to login will result in an error being thrown.
+  */
+
   it('should create', () => {
     expect(component).toBeTruthy();
   });
@@ -48,7 +55,6 @@ describe('LoginComponent', () => {
 
   // make sure you can log in with valid credentials
   it('should allow login on valid credentials', () => {
-
     // populate email and password with valid credentials
     component.email = backend.getUsers()[0].email;
     component.password = backend.getUsers()[0].email;
@@ -62,7 +68,6 @@ describe('LoginComponent', () => {
   });
 
   it('should prevent login with an invalid email', () => {
-
     // provide a horifically invalid email
     component.email = "invalid@invalid.com";
     component.password = "somepassword";
@@ -79,7 +84,6 @@ describe('LoginComponent', () => {
   });
 
   it('should prevent login with an invalid password', () => {
-
     // provide an invalid password, null for example
     component.email = backend.getUsers()[0].username;
     component.password = null;
@@ -87,7 +91,7 @@ describe('LoginComponent', () => {
     // ensure that this email is a real email in our database
     expect(backend.getUserByEmail(component.email)).toBeTruthy();
 
-    // perform a login
+    // perform a login expecting a problem
     try {
       component.login();
     } catch (error) {

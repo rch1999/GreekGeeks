@@ -9,6 +9,7 @@ import { AboutComponent } from './about/about.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { OrganizationComponent } from './organization/organization.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { FormsModule } from '@angular/forms';
     SignupComponent,
     LoginComponent,
     AboutComponent,
-    NavbarComponent
+    NavbarComponent,
+    OrganizationComponent
   ],
   imports: [
     BrowserModule,
