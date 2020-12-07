@@ -13,6 +13,7 @@ paths:
       tags: []
       operationId: get-organization-contacts
       summary: Get a list of all organization contacts
+      parameters: []
     post:
       tags: []
       operationId: add-organization-contact
@@ -51,6 +52,7 @@ paths:
   '/organizations/{orgId}/members/{memberId}':
     get:
       tags: []
+      operationId: get-organization-member
     delete:
       tags: []
       operationId: delete-organization-member
@@ -65,41 +67,197 @@ paths:
   '/organizations/{orgId}/requests/{requestId}':
     get:
       tags: []
+      operationId: get-membership-request
     post:
       tags: []
+      operationId: accept-membership-request
     delete:
       tags: []
+      operationId: reject-membership-request
     x-last-modified: 1606781579238
   /users:
     post:
       description: ''
+      operationId: register-account
     x-last-modified: 1606781597408
   '/users/{userId}':
     get:
       description: ''
+      operationId: get-user
     post:
       description: ''
+      operationId: modify-user
     delete:
       description: ''
+      operationId: delete-user
     x-last-modified: 1606781607142
   '/users/{userId}/notifications':
     get:
       description: ''
+      operationId: get-user-notifications
     post:
       description: ''
+      operationId: add-user-notification
     x-last-modified: 1606781643091
   '/users/{userId}/notifications/{notificationId}':
     get:
       tags: []
+      operationId: get-user-notification
     delete:
       tags: []
+      operationId: delete-user-notification
     x-last-modified: 1606781758327
 components:
   securitySchemes: {}
-  schemas: {}
+  schemas:
+    Contact:
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        organization:
+          $ref: "#components/schemas/Organization"
+    Contacts:
+      type: array
+      items:
+        $ref: "#components/schemas/Contact"
+
+    Note:
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        contact:
+          $ref: "#/components/schemas/Contact"
+        created_by:
+          $ref: "#/components/schemas/Member"
+        created:
+          type: string
+          format: date-time
+        body:
+          type: string
+        tags:
+          $ref: "#/components/schemas/Tags"
+    Notes:
+      type: array
+      items:
+        $ref: "#/components/schemas/Note"
+
+    Tag:
+      type: string
+    Tags:
+      type: array
+      items:
+        $ref: "#/components/schemas/Tag"
+
+    User:
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        is_admin:
+          type: boolean
+        is_staff:
+          type: boolean
+        created:
+          type: string
+          format: date-time
+        updated:
+          type: string
+          format: date-time
+
+    Notification:
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        user:
+          $ref: "#/components/schemas/User"
+        created:
+          type: string
+          format: date-time
+        body:
+          type: string
+    Notifications:
+      type: array
+      items:
+        $ref: "#/components/schemas/Notification"
+
+    Member:
+      $ref: "#/components/schemas/User"
+    Members:
+      type: array
+      items:
+        $ref: "#/components/schemas/Member"
+    MembershipRequest:
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        organization:
+          $ref: "#/components/schemas/Organization"
+        user:
+          $ref: "#/components/schemas/User"
+
+    Organization:
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        institution:
+          type: string
+        chapter_name:
+          type: string
+        users:
+          $ref: "#/components/schemas/Members"
+        admin_users:
+          $ref: "#/components/schemas/Members"
+
+    Task:
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        organization:
+          $ref: "#/components/schemas/Organization"
+        assigner:
+          $ref: "#/components/schemas/Member"
+        assignees:
+          $ref:  "#/components/schemas/Members"
+        title:
+          type: string
+        body:
+          type: string
+        due_date:
+          type: string
+          format: date-time
+
+    OrganizationImage:
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        organization:
+          $ref: "#/components/schemas/Organization"
+        created:
+          type: string
+          format: date-time
+        created_by:
+          $ref: "#/components/schemas/Member"
+        image:
+          type: string
+          format: uri
   responses: {}
   parameters: {}
 tags: []
-servers: []
+servers:
+  - url: 'https://api.example.io'
 security: []
 externalDocs: null
