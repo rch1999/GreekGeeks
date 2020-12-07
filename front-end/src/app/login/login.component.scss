@@ -1,0 +1,102 @@
+.container {
+    position:fixed;
+    // top:0;
+    // left: 0;
+    width:100%;
+    height:100%;
+    overflow: hidden;
+    background:
+    linear-gradient(270deg, rgba(236, 209, 208, 0.3), rgba(132, 215, 229, 0.9)),
+    url('../../assets/background.png') center center no-repeat;;
+    background-size: cover;
+}
+
+image {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+    width: 150px;
+}
+
+.loginCard {
+    display: block;
+    border: 1px solid #000;
+    border-radius: 4px;
+    background-color:  rgba(52, 112, 241, 0.9);
+    width: 700px;
+    height: 520px;
+    margin: auto;
+    margin-top: 30px;
+    padding: 80px 30px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.17), 0 1px 2px rgba(0,0,0,0.24);
+    overflow: hidden;
+}
+
+.loginCard:hover {
+    border: 4px solid rgb(255, 255, 255);
+    transition: ease-in 0.2s;
+  }
+
+.formInput {
+    display: block;
+    width: 100%;
+    height: 40px;
+    border-radius: 4px;
+    background: #ecf0f1;
+    border: #ccc 1px solid;
+    padding: 8px;
+    font-size: 1em;
+    margin-bottom: 18px;
+}
+
+.btn{
+    height: 54px;
+    margin-top: 32px;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    border-radius: 400px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.17), 0 1px 2px rgba(0,0,0,0.24);
+    transition: ease-in 0.2s;
+    width: 100%;
+}
+
+#btn-login {
+    background-color:#091aff;
+}
+
+#btn-login:hover {
+    background-color:#0a138b;
+}
+
+#btn-login:disabled {
+    background-color: rgb(167, 163, 163);
+    color: #999;
+}
+
+h2 {
+    text-align: center;
+    height: 2em;
+}
+
+a {
+    text-decoration: none;
+}
+
+.label {
+    font-size: 0.9em;
+    color: white;
+}
+
+.error {
+    font-size: 0.8em;
+    color: darkred;
+    font-style: italic;
+}
+
+.doHyeon {
+    font-family: 'Do Hyeon', sans-serif;
+}

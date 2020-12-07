@@ -1,0 +1,37 @@
+<div class="container doHyeon">
+    <div class="signUpCard">
+        <img style="width: 50px;" src="../../assets/building-blocks.png">  
+        <form #signupForm="ngForm">
+            <h2 style="color: white;" class="heading">Sign Up</h2>
+
+            <label class="label">Email</label>
+                <input
+                type="email" name="email"
+                placeholder="Enter your email address"
+                [(ngModel)]="email" class="formInput doHyeon"
+                maxlength="60" required/>
+            
+            <Label class="label">Password</Label>
+                <input
+                type="password" name="password"
+                placeholder="Choose a password"
+                minlength="6"
+                [(ngModel)]="password" class="formInput doHyeon"
+                required/>
+            
+            <Label class="label">Display Name</Label>
+                <input
+                name="displayName"
+                placeholder="Enter a display name"
+                [(ngModel)]="displayName" class="formInput doHyeon"
+                maxlength="9" required/>
+
+                <button [disabled]="!signupForm.form.valid"
+                        type="submit" (click)="signUp()"
+                        class="btn" id="btn-signUp">
+                        Sign Up    
+                </button>
+            <Label *ngIf="errorMsg" class="error"> {{errorMsg}} </Label>
+        </form>
+    </div>
+</div>

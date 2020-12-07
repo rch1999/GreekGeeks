@@ -1,0 +1,32 @@
+<div class="container">
+    <div class="aboutCard doHyeon">
+      <h2 class="heading">About Chapter Builder</h2>
+        <button class="btn doHyeon" 
+                id="btn-login" 
+                (click)="toggleTechStack()">
+                Tech Stack
+        </button>
+        <button class="btn doHyeon"
+                id="btn-login"
+                (click)="toggleContributors()">
+                Contributors </button>
+                <button class="btn doHyeon"
+                id="btn-login"
+                (click)="toggleFeatures()">
+                Features </button>
+        
+    </div>
+    <div *ngIf="anyToggles()" class="extrasCard doHyeon">
+        <span class="extra">
+            <label *ngIf="showTech()">Made with Angular 8 and Django.</label>
+        </span>
+        <span class="extra">  
+            <label *ngIf="showContributors()" >Contributors: Zachary Ward, Ryan Helmann, Tim Clough,
+                Ryan Bartone and Soloman Chau
+            </label>
+        </span>
+        <span class="extra">
+            <mark *ngIf="showFeatures()">FEATURES: Auth (IP), Organization Feed (IP) </mark>
+        </span>
+    </div>
+  </div>
