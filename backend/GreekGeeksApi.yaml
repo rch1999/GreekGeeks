@@ -8,121 +8,642 @@ info:
   license: null
   contact: null
 paths:
+  /token:
+    security: []
+    post:
+      operationId: get-token
+      summary: "Get a access token/refresh token pair."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Credentials"
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JWT"
+              examples:
+                JWT:
+                  access: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjA3MzgxODE2LCJqdGkiOiJmMjAyZTZmYjYzMzU0NzQ1YmNjZDJhYWQwYWNkZTg0OCIsInVzZXJfaWQiOjF9.u_GyCyr5S6UQAl6DRf4WotcL6zg0yIz8UKCXy7wQveM"
+                  refresh: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYwNzQ2NzkxNiwianRpIjoiN2E3YWFhMzYwMzQyNGYxMzlhZjNlNDk1NmFhMjZlNzQiLCJ1c2VyX2lkIjoxfQ.QBpYG8MsOnkLKorYAD41PnnvwXmvXDPUj_UtkaWlmCo"
+  /token/refresh:
+    post:
+      operationId: refresh-token
+      summary: "Get an access token from a refresh token."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                refresh:
+                  type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  access:
+                    type: string
   '/organizations/{orgId}/contacts':
     get:
       tags: []
       operationId: get-organization-contacts
-      summary: Get a list of all organization contacts
-      parameters: []
+      summary: "Get a list of all organization contacts."
+      parameters:
+      - name: orgId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#components/schemas/Contact"
     post:
       tags: []
       operationId: add-organization-contact
-      summary: Add a new contact to an organization
-    x-last-modified: 1606781402472
+      summary: "Add a new contact to an organization."
+      parameters:
+      - name: orgId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            $ref: "#components/schemas/ContactAddition"
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResourceAdditionResponse"
   '/organizations/{orgId}/contacts/{contactId}':
     get:
       tags: []
       operationId: get-organization-contact
-      summary: Get an organization contact
+      summary: "Get an organization contact."
+      parameters:
+      - name: orgId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      - name: contactId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contact"
     post:
       tags: []
       operationId: update-organization-contact
-      summary: Update an organization's contact
+      summary: "Update an organization's contact."
+      parameters:
+      - name: orgId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      - name: contactId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactUpdate"
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResourceUpdateResponse"
     delete:
       tags: []
       operationId: delete-organization-contact
-      summary: Delete an organization contact
-    x-last-modified: 1606781425400
+      summary: "Delete an organization contact."
+      parameters:
+      - name: orgId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      - name: contactId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref:  "#/components/schemas/ResourceDeletionResponse"
+  '/organizations/{orgId}/contacts/{contactId}/notes':
+    post:
+      operationId: add-contact-note
+      summary: "Add a note for a contact."
+      parameters:
+      - name: orgId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      - name: contactId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteAddition"
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResourceAdditionResponse"
+
   '/organizations/{orgId}/contacts/{contactId}/notes/{noteId}':
     delete:
       tags: []
       operationId: delete-contact-note
-      summary: Delete a contact note
-    x-last-modified: 1606781456677
+      summary: "Delete a contact note."
+      parameters:
+      - name: orgId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      - name: contactId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      - name: noteId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref:  "#/components/schemas/ResourceDeletionResponse"
   '/organizations/{orgId}/members':
     get:
       tags: []
       operationId: get-organization-members
-      summary: Get all of an organization's members
-    post:
-      tags: []
-      operationId: add-organization-member
-      summary: Add a new organization member
-    x-last-modified: 1606781477596
+      summary: "Get all of an organization's members."
+      parameters:
+      - name: orgId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Members"
+
   '/organizations/{orgId}/members/{memberId}':
     get:
       tags: []
       operationId: get-organization-member
+      summary: "Get information about an organization member."
+      parameters:
+      - name: orgId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      - name: memberId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Member"
     delete:
       tags: []
       operationId: delete-organization-member
-      summary: Delete an organization member
-    x-last-modified: 1606781503669
+      summary: "Delete an organization member from an organization."
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref:  "#/components/schemas/ResourceDeletionResponse"
+
   '/organizations/{orgId}/requests':
     get:
       tags: []
+      operationId: get-organization-requests
+      summary: "Get a list of membership requests for an organization."
+      parameters:
+      - name: orgId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MembershipRequests"
     post:
       tags: []
-    x-last-modified: 1606781533619
+      operationId: add-organization-request
+      summary: "Add a membership request for an organization."
+      parameters:
+      - name: orgId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            $ref: "#/components/schemas/MembershipRequestAddition"
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResourceAdditionResponse"
+
   '/organizations/{orgId}/requests/{requestId}':
     get:
       tags: []
       operationId: get-membership-request
+      summary: "Get information about a membership request."
+      parameters:
+      - name: orgId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      - name: requestId
+        in: path
+        schema:
+           type: string 
+           format: uuid
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MembershipRequest"
     post:
       tags: []
       operationId: accept-membership-request
+      summary: "Accept a membership request."
+      parameters:
+      - name: orgId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      - name: requestId
+        in: path
+        schema:
+           type: string 
+           format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MembershipRequestAcceptance"
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResourceUpdateResponse"
     delete:
       tags: []
       operationId: reject-membership-request
-    x-last-modified: 1606781579238
+      summary: "Reject a membership request."
+      parameters:
+      - name: orgId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      - name: requestId
+        in: path
+        schema:
+           type: string 
+           format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MembershipRequestAcceptance"
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref:  "#/components/schemas/ResourceDeletionResponse"
   /users:
     post:
-      description: ''
       operationId: register-account
-    x-last-modified: 1606781597408
+      summary: "Register for an account."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserAddition"
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResourceAdditionResponse"
   '/users/{userId}':
     get:
-      description: ''
       operationId: get-user
+      summary: "Get information about a user."
+      parameters:
+      - name: userId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref:  "#/components/schemas/User"
     post:
-      description: ''
       operationId: modify-user
+      summary: "Update user information."
+      parameters:
+      - name: userId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        schema:
+          $ref:  "#/components/schemas/UserUpdate"
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref:  "#/components/schemas/ResourceAdditionResponse"
     delete:
-      description: ''
       operationId: delete-user
-    x-last-modified: 1606781607142
+      summary: "Delete an account."
+      parameters:
+      - name: userId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref:  "#/components/schemas/ResourceDeletionResponse"
   '/users/{userId}/notifications':
     get:
-      description: ''
       operationId: get-user-notifications
-    post:
-      description: ''
-      operationId: add-user-notification
-    x-last-modified: 1606781643091
+      summary: "Get a list of notifications for a user."
+      parameters:
+      - name: userId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notifications"
+
   '/users/{userId}/notifications/{notificationId}':
     get:
       tags: []
       operationId: get-user-notification
+      summary: "Get information about a specific notification."
+      parameters:
+      - name: userId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      - name: notificationId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notification"
     delete:
       tags: []
       operationId: delete-user-notification
-    x-last-modified: 1606781758327
+      summary: "Delete a notification."
+      parameters:
+      - name: userId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      - name: notificationId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref:  "#/components/schemas/ResourceDeletionResponse"
 components:
-  securitySchemes: {}
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
   schemas:
+    ResourceAdditionResponse:
+      required:
+      - success
+      properties:
+        success:
+          type: boolean
+        uuid:
+          type: string
+          format: uuid
+        errorMessage:
+          type: string
+    ResourceUpdateResponse:
+      required:
+      - success
+      properties:
+        success:
+          type: boolean
+        errorMessage:
+          type: string
+    ResourceDeletionResponse:
+      required:
+      - sucess
+      properties:
+        success:
+          type: boolean
+        errorMessage:
+          type: string
+
+    Credentials:
+      required:
+      - email
+      - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+    JWT:
+      required:
+      - email
+      - password
+      properties:
+        access:
+          type: string
+        refresh:
+          type: string
+
     Contact:
+      required:
+      - uuid
+      - organization
+      - first_name
+      - last_name
+      - primary_contact_method
+      - rank
       properties:
         uuid:
           type: string
           format: uuid
         organization:
           $ref: "#components/schemas/Organization"
+        first_name:
+          type: string
+        last_name:
+          type: string
+        primary_contact_method:
+          $ref: "#components/schemas/ContactMethod"
+        rank:
+          $ref: "#components/schemas/ContactRank"
     Contacts:
       type: array
       items:
         $ref: "#components/schemas/Contact"
 
+    ContactAddition:
+      required:
+      - first_name
+      - last_name
+      - primary_contact_method
+      - rank_uuid
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        primary_contact_method:
+          $ref:  "#/components/schemas/ContactMethod"
+        rank_uuid:
+          type: string
+          format: uuid
+
+    ContactUpdate:
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        primary_contact_method_uuid:
+          type: string
+          format: uuid
+        rank_uuid:
+          type: string
+          format: uuid
+
+    ContactMethod:
+      required:
+      - uuid
+      - medium
+      - value
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        medium:
+          type: string
+        vaule:
+          type: string
+
+    ContactRank:
+      required:
+      - uuid
+      - organization
+      - name
+      - description
+      properties:
+        uuid:
+          type: string 
+          format: uuid
+        organization: 
+          $ref: "#/components/schemas/Organization"        
+        name:
+          type: string
+        description:
+          type: string
+    
     Note:
+      required:
+      - uuid
+      - contact
+      - created_by
+      - created
+      - body
+      - tags
       properties:
         uuid:
           type: string
@@ -142,6 +663,18 @@ components:
       type: array
       items:
         $ref: "#/components/schemas/Note"
+    NoteAddition:
+      properties:
+        contact_uuid:
+          type: string
+          format: uuid
+        created_by_uuid:
+          type: string
+          format: uuid
+        body:
+          type: string
+        tags:
+          $ref: "#/components/schemas/Tags"
 
     Tag:
       type: string
@@ -151,6 +684,15 @@ components:
         $ref: "#/components/schemas/Tag"
 
     User:
+      required:
+      - uuid
+      - first_name
+      - last_name
+      - email
+      - is_admin
+      - is_staff
+      - created
+      - updated
       properties:
         uuid:
           type: string
@@ -172,8 +714,37 @@ components:
         updated:
           type: string
           format: date-time
+    UserAddition:
+      required:
+      - first_name
+      - last_name
+      - email
+      - password
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+    UserUpdate:
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        password:
+          type: string
 
     Notification:
+      required:
+      - uuid
+      - user
+      - created
+      - body
       properties:
         uuid:
           type: string
@@ -197,6 +768,10 @@ components:
       items:
         $ref: "#/components/schemas/Member"
     MembershipRequest:
+      required:
+      - uuid
+      - organization
+      - user
       properties:
         uuid:
           type: string
@@ -205,8 +780,32 @@ components:
           $ref: "#/components/schemas/Organization"
         user:
           $ref: "#/components/schemas/User"
+    MembershipRequests:
+      type: array
+      items:
+        $ref: "#/components/schemas/MembershipRequest"
+    MembershipRequestAddition:
+      required:
+      - organization_uuid
+      - user_uuid
+      properties:
+        organization_uuid:
+          type: string
+          format: uuid
+        user_uuid:
+          type: string
+          format: uuid
+    MembershipRequestAcceptance:
+      properties: []
+
 
     Organization:
+      required:
+      - uuid
+      - institution
+      - chapter_name
+      - members
+      - admin_members
       properties:
         uuid:
           type: string
@@ -215,12 +814,20 @@ components:
           type: string
         chapter_name:
           type: string
-        users:
+        members:
           $ref: "#/components/schemas/Members"
-        admin_users:
+        admin_members:
           $ref: "#/components/schemas/Members"
 
     Task:
+      required:
+      - uuid
+      - organization
+      - assigner
+      - assignees
+      - title
+      - body
+      - due_date
       properties:
         uuid:
           type: string
@@ -240,6 +847,12 @@ components:
           format: date-time
 
     OrganizationImage:
+      required:
+      - uuid
+      - organization
+      - created
+      - created_by
+      - image
       properties:
         uuid:
           type: string
@@ -257,7 +870,7 @@ components:
   responses: {}
   parameters: {}
 tags: []
-servers:
-  - url: 'https://api.example.io'
-security: []
+servers: []
+security:
+- JWTAuth: []
 externalDocs: null

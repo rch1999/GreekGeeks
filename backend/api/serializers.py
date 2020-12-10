@@ -69,6 +69,13 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
 
+class UserAdditionSerializer(serializers.Serializer):
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    email = serializers.EmailField()
+    password = serializers.CharField()
+
+
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Notification
