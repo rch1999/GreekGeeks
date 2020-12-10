@@ -4,9 +4,12 @@ from rest_framework.response import Response
 import api.serializers as serializers
 import api.models as models
 from django.db.utils import IntegrityError
+from rest_framework.permissions import AllowAny
 
 
 class UsersView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request, format=None):
         data = serializers.UserAdditionSerializer(data=request.data)
         if data.is_valid():
