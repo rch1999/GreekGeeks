@@ -585,7 +585,7 @@ components:
         last_name:
           type: string
         primary_contact_method:
-          $ref:  "#/components/schemas/ContactMethod"
+          $ref:  "#/components/schemas/ContactMethodAddition"
         rank_uuid:
           type: string
           format: uuid
@@ -678,13 +678,10 @@ components:
       items:
         $ref: "#/components/schemas/Note"
     NoteAddition:
+      required:
+      - body
+      - tags
       properties:
-        contact_uuid:
-          type: string
-          format: uuid
-        created_by_uuid:
-          type: string
-          format: uuid
         body:
           type: string
         tags:
@@ -800,12 +797,8 @@ components:
         $ref: "#/components/schemas/MembershipRequest"
     MembershipRequestAddition:
       required:
-      - organization_uuid
       - user_uuid
       properties:
-        organization_uuid:
-          type: string
-          format: uuid
         user_uuid:
           type: string
           format: uuid

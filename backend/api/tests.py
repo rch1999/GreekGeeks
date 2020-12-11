@@ -61,6 +61,14 @@ class ApiBaseTestCase(TransactionTestCase):
         )
         return contact
 
+    def make_rank1(self, org):
+        rank = models.ContactRank(
+            organization=org,
+            name='A',
+            description='Interested in signing bid'
+        )
+        return rank
+
 
 class TokenTestCase(ApiBaseTestCase):
     def setUp(self):
@@ -120,6 +128,9 @@ class ContactsTestCase(ApiBaseTestCase):
 
         self.contact2 = self.make_contact2(self.org, self.user)
 
+        self.rank = self.make_rank1(self.org)
+        self.rank.save()
+
         # Get access token
         data = {
             'email': self.user.email,
@@ -144,7 +155,12 @@ class ContactsTestCase(ApiBaseTestCase):
         data = {
             'first_name': self.contact2.first_name,
             'last_name': self.contact2.last_name,
-            'organization_uuid': self.org.uuid
+            'organization_uuid': self.org.uuid,
+            'rank_uuid': self.rank.uuid,
+            'primary_contact_method': {
+                'phone',
+                '(123)-456-7890'
+            }
         }
         response = self.client.post(
             f'/api/organizations/{self.org.uuid}/contacts/',

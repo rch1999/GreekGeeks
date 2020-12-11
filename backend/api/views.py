@@ -8,6 +8,7 @@ import api.models as models
 import api.serializers as serializers
 import api.permissions as permissions
 # TODO input validation
+# TODO database failure responses (e.g. actually handle instead of 500'ing)
 
 
 class ContactsView(APIView):
@@ -22,13 +23,12 @@ class ContactsView(APIView):
         self.check_object_permissions(request, obj)
 
         contacts = models.Organization.objects.get(uuid=orgId) \
-                      .contact_set.all()
+                         .contact_set.all()
         contacts = serializers.ContactSerializer(contacts, many=True)
 
         return Response(contacts.data, status.HTTP_200_OK)
 
     def post(self, request, orgId):
-        # TODO
         obj = {'orgId': orgId}
         self.check_object_permissions(request, obj)
 
@@ -44,7 +44,7 @@ class ContactsView(APIView):
                 created_by=request.user,
                 first_name=first_name
             )
-            
+
             if 'last_name' in data.data:
                 contact.last_name = data.data['last_name']
             if 'primary_contact_method' in data.data:
@@ -59,7 +59,7 @@ class ContactsView(APIView):
                 rank = models.Organization.objects.get(uuid=org_uuid) \
                     .contactrank_set.get(uuid=data.data['rank_uuid'])
 
-                cm.rank = rank
+                contact.rank = rank
 
             contact.save()
 
@@ -84,24 +84,54 @@ class ContactView(APIView):
         self.check_object_permissions(request, obj)
 
         contact = models.Organization.objects.get(uuid=orgId) \
-                      .contact_set.get(uuid=contactId)
+                        .contact_set.get(uuid=contactId)
         contact = serializers.ContactSerializer(contact)
 
         return Response(contact.data, status.HTTP_200_OK)
 
     def post(self, request, orgId, contactId):
-        # TODO
         obj = {'orgId': orgId}
         self.check_object_permissions(request, obj)
 
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        data = serializers.ContactUpdateSerializer(data=request.data)
+        if data.is_valid():
+            contact = models.Organization.objects.get(uuid=orgId) \
+                        .contact_set.get(uuid=contactId)
+
+            if 'first_name' in data.data:
+                contact.first_name = data.data['first_name']
+            if 'last_name' in data.data:
+                contact.last_name = data.data['last_name']
+            if 'primary_contact_method_uuid' in data.data:
+                cm_uuid = data.data['primary_contact_method_uuid']
+                cm = contact.contactmethod_set.get(uuid=cm_uuid)
+                contact.primary_contact_method = cm
+            if 'rank_uuid' in data.data:
+                rank_uuid = data.data['rank_uuid']
+                rank = models.Organization.objects.get(uuid=orgId) \
+                             .rank_set.get(uuid=rank_uuid)
+
+            contact.save()
+
+            response = {
+                'success': True
+            }
+            return Response(response, status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, orgId, contactId):
-        # TODO
         obj = {'orgId': orgId}
         self.check_object_permissions(request, obj)
 
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        org = models.Organization.objects.get(uuid=orgId)
+        contact = org.contact_set.get(uuid=contactId)
+        org.contact_set.remove(contact)
+
+        response = {
+            'success': True
+        }
+        return Response(response, status.HTTP_200_OK)
 
 
 class ContactNotesView(APIView):
@@ -112,11 +142,28 @@ class ContactNotesView(APIView):
     allowed_methods = ['POST']
 
     def post(self, request, orgId, contactId):
-        # TODO
         obj = {'orgId': orgId}
         self.check_object_permissions(request, obj)
 
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        data = serializers.ContactNoteAdditionSerializer(data=request.data)
+        if data.is_valid():
+            contact = models.Organization.get(uuid=orgId) \
+                        .contacts_set.get(uuid=contactId)
+            body = data.data['body']
+            # TODO tag support
+            note = models.ContactNote(
+                contact=contact,
+                created_by=request.user,
+                body=body
+            )
+            note.save()
+
+            response = {
+                'success': True
+            }
+            return Response(response, status.HTTP_201_CREATED)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class ContactNoteView(APIView):
@@ -127,11 +174,13 @@ class ContactNoteView(APIView):
     allowed_methods = ['DELETE']
 
     def delete(self, request, orgId, contactId, noteId):
-        # TODO
         obj = {'orgId': orgId}
         self.check_object_permissions(request, obj)
 
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        contact = models.Organization.objects.get(uuid=orgId) \
+                        .contact_set.get(uuid=contactId)
+        note = contact.contactnote_set.get(uuid=noteId)
+        contact.contact_set.remove(note)
 
 
 class MembersView(APIView):
@@ -165,7 +214,7 @@ class MemberView(APIView):
         self.check_object_permissions(request, obj)
 
         user = models.Organization.objects.get(uuid=orgId) \
-                .users.get(uuid=memberId)
+                     .users.get(uuid=memberId)
 
         user = serializers.MemberSerializer(user)
         return Response(user.data, status=status.HTTP_200_OK)
@@ -192,50 +241,94 @@ class RequestsView(APIView):
     allowed_methods = ['GET', 'POST']
 
     def get(self, request, orgId):
-        # TODO
-        obj = {'orgId': orgId}
+        obj = {'orgId': orgId, 'userId': None}
         self.check_object_permissions(request, obj)
 
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        org = models.Organization.objects.get(uuid=orgId)
+        reqs = org.membershiprequest_set.all()
+        reqs = serializers.MembershipRequestSerializer(reqs, many=True)
+
+        return Response(reqs.data, status.HTTP_200_OK)
 
     def post(self, request, orgId):
-        # TODO
-        obj = {'orgId': orgId}
-        self.check_object_permissions(request, obj)
+        data = serializers.MembershipRequestAdditionSerializer(
+            data=request.data
+        )
+        if data.is_valid():
+            user_uuid = data['user_uuid']
+            # make sure user uuid matches data uuid
+            obj = {'orgId': orgId, 'userId': user_uuid}
+            self.check_object_permissions(request, obj)
 
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+            org = models.Organization.objects.get(uuid=orgId)
+            user = models.User.objects.get(uuid=user_uuid)
+
+            mr = models.MembershipRequest(
+                organization=org,
+                user=user
+            )
+            mr.save()
+
+            response = {
+                'success': True,
+                'uuid': mr.uuid
+            }
+            return Response(response, status.HTTP_201_CREATED)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class RequestView(APIView):
     """
     /organizations/{orgId}/requests/{requestId}/
     """
-    permission_classes = [permissions.IsOrganizationAdmin]
+    permission_classes = [permissions.IsOrganizationAdminOrDeleteOnly]
     allowed_methods = ['GET', 'POST', 'DELETE']
 
     def get(self, request, orgId, requestId):
-        obj = {'orgId': orgId}
+        obj = {'orgId': orgId, 'userId': None}
         self.check_object_permissions(request, obj)
 
         mr = models.Organization.objects.get(uuid=orgId) \
-                    .membershiprequest_set.get(uuid=requestId)
+                   .membershiprequest_set.get(uuid=requestId)
         mr = serializers.MembershipRequestSerializer(request)
 
         return Response(mr.data, status.HTTP_200_OK)
 
     def post(self, request, orgId, requestId):
-        # TODO
-        obj = {'orgId': orgId}
+        obj = {'orgId': orgId, 'userId': None}
         self.check_object_permissions(request, obj)
 
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        org = models.Organization.objects.get(uuid=orgId)
+        mr = org.membershiprequest_set.get(uuid=requestId)
+
+        user = mr.user
+
+        # TODO should probably be executed as transaction or something
+        # add user
+        org.users.add(user)
+
+        # delete request
+        org.membershiprequest_set.remove(mr)
+
+        response = {
+            'success': True
+        }
+        return Response(response, status.HTTP_200_OK)
 
     def delete(self, request, orgId, requestId):
-        # TODO
-        obj = {'orgId': orgId}
+        org = models.Organizations.objects.get(uuid=orgId)
+        request = org.membershiprequest_set.get(uuid=requestId)
+
+        obj = {'orgId': orgId, 'userId': request.user.uuid}
         self.check_object_permissions(request, obj)
 
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        org.membershiprequest_set.remove(request)
+
+        response = {
+            'success': True
+        }
+        return Response(response, status.HTTP_200_OK)
 
 
 class UsersView(APIView):
@@ -284,11 +377,13 @@ class UserView(APIView):
     allowed_methods = ['GET', 'POST', 'DELETE']
 
     def get(self, request, userId):
-        # TODO
         obj = {'userId': userId}
         self.check_object_permissions(request, obj)
 
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        user = models.Users.objects.get(uuid=userId)
+        user = serializers.UserSerializer(user)
+
+        return Response(user.data, HTTP_200_OK)
 
     def post(self, request, userId):
         obj = {'userId': userId}
@@ -318,11 +413,16 @@ class UserView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, userId):
-        # TODO
         obj = {'userId': userId}
         self.check_object_permissions(request, obj)
 
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        user = models.Users.objects.get(uuid=userId)
+        user.delete()
+
+        response = {
+            'success': True
+        }
+        return Response(response, status.HTTP_200_OK)
 
 
 class NotificationsView(APIView):
@@ -333,11 +433,17 @@ class NotificationsView(APIView):
     allowed_methods = ['GET']
 
     def get(self, request, userId):
-        # TODO
         obj = {'userId': userId}
         self.check_object_permissions(request, obj)
 
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        notifications = models.User.objects.get(uuid=userId) \
+                              .notification_set.all()
+
+        notifications = serializers.NotificationSerializer(
+            notifications.data,
+            many=True
+        )
+        return Response(notifications.data, status.HTTP_200_OK)
 
 
 class NotificationView(APIView):
@@ -348,15 +454,23 @@ class NotificationView(APIView):
     allowed_methods = ['GET', 'DELETE']
 
     def get(self, request, userId, notificationId):
-        # TODO
         obj = {'userId': userId}
         self.check_object_permissions(request, obj)
 
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        notification = models.User.objects.get(uuid=userId) \
+                             .notification_set.get(uuid=notificationId)
+
+        notification = serializers.NotificationSerializer(notification.data)
+
+        return Response(notification.data, status.HTTP_200_OK)
 
     def delete(self, request, userId, notificationId):
-        # TODO
         obj = {'userId': userId}
         self.check_object_permissions(request, obj)
 
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        notification = models.User.objects.get(uuid=userId) \
+                             .notification_set.get(uuid=notificationId)
+
+        notification = serializers.NotificationSerializer(notification.data)
+
+        return Response(notification.data, status.HTTP_200_OK)

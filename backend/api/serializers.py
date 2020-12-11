@@ -31,6 +31,18 @@ class ContactAdditionSerializer(serializers.Serializer):
     organization_uuid = serializers.UUIDField()
 
 
+class ContactUpdateSerializer(serializers.Serializer):
+    first_name = serializers.CharField(required=False)
+    last_name = serializers.CharField(required=False)
+    primary_contact_method_uuid = serializers.UUIDField(required=False)
+    rank_uuid = serializers.UUIDField(required=False)
+
+
+class ContactNoteAdditionSerializer(serializers.Serializer):
+    body = serializers.CharField()
+    tags = serializers.ListSerializer(child=serializers.CharField())
+
+
 class ContactRankSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.ContactRank
@@ -143,6 +155,10 @@ class MembershipRequestSerializer(serializers.ModelSerializer):
             'organization',
             'user'
         ]
+
+
+class MembershipRequestAdditionSerializer(serializers.Serializer):
+    user_uuid = serializers.UUIDField()
 
 
 class TaskSerializer(serializers.ModelSerializer):

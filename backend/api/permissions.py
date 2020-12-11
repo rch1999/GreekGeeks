@@ -47,7 +47,21 @@ class IsOrganizationAdminOrPostOnly(permissions.BasePermission):
         user = request.user
         is_admin = user.admin_of.filter(uuid=orgId).count() > 0
 
-        return is_admin or request.method == 'POST'
+        userId = obj['userId']
+        return is_admin or (request.method == 'POST' and userId == user.uuid)
+
+
+class IsOrganizationAdminOrDeleteOnly(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if not(request.user and request.user.is_authenticated):
+            return False
+
+        orgId = obj['orgId']
+        user = request.user
+        is_admin = user.admin_of.filter(uuid=orgId).count() > 0
+
+        userId = obj['userId']
+        return is_admin or (request.method == 'DELETE' and userId == user.uuid)
 
 
 class OwnsAccount(permissions.BasePermission):
