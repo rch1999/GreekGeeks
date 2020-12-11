@@ -1,14 +1,118 @@
-from rest_framework.views import APIView
-from rest_framework import authentication, permissions, status
-from rest_framework.response import Response
-import api.serializers as serializers
-import api.models as models
 from django.db.utils import IntegrityError
+from rest_framework import authentication, permissions, status
 from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+import api.models as models
+import api.serializers as serializers
 # TODO input validation
 
 
+class ContactsView(APIView):
+    """
+    /organizations/{orgId}/contacts/
+    """
+    def get(self):
+        # TODO
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def post(self):
+        # TODO
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class ContactView(APIView):
+    """
+    /organizations/{orgId}/contacts/{contactId}/
+    """
+    def get(self):
+        # TODO
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def post(self):
+        # TODO
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def delete(self):
+        # TODO
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class ContactNotesView(APIView):
+    """
+    /organizations/{orgId}/contacts/{contactId}/notes/
+    """
+    def post(self):
+        # TODO
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class ContactNoteView(APIView):
+    """
+    /organizations/{orgId}/contacts/{contactId}/notes/{noteId}/
+    """
+    def delete(self):
+        # TODO
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class MembersView(APIView):
+    """
+    /organizations/{orgId}/members/
+    """
+    def get(self):
+        # TODO
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class MemberView(APIView):
+    """
+    /organizations/{orgId}/members/{memberId}/
+    """
+    def get(self):
+        # TODO
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def delete(self):
+        # TODO
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class RequestsView(APIView):
+    """
+    /organizations/{orgId}/requests/
+    """
+    def get(self):
+        # TODO
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def post(self):
+        # TODO
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class RequestView(APIView):
+    """
+    /organizations/{orgId}/requests/{requestId}/
+    """
+    def get(self):
+        # TODO
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def post(self):
+        # TODO
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def delete(self):
+        # TODO
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
 class UsersView(APIView):
+    """
+    /users/
+    """
     permission_classes = [AllowAny]
 
     def post(self, request, format=None):
@@ -41,9 +145,18 @@ class UsersView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-class SpecificUsersView(APIView):
-    def post(self, request, uuid, format=None):
+class UserView(APIView):
+    """
+    /users/{userId}/
+    """
+    def get(self):
+        # TODO
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def post(self, request, userId, format=None):
         user = request.user
+        if userId != user.uuid:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         data = serializers.UserUpdateSerializer(data=request.data)
         if data.is_valid():
@@ -63,3 +176,28 @@ class SpecificUsersView(APIView):
             return Response(response, status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class NotificationsView(APIView):
+    """
+    /users/{userId}/notifications/
+    """
+    def get(self):
+        # TODO
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class NotificationView(APIView):
+    """
+    /users/{userId}/notifications/{notificationId}/
+    """
+    def get(self):
+        # TODO
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def delete(self):
+        # TODO
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

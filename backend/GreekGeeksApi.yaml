@@ -8,7 +8,7 @@ info:
   license: null
   contact: null
 paths:
-  /token:
+  /token/:
     security: []
     post:
       operationId: get-token
@@ -28,7 +28,7 @@ paths:
                 JWT:
                   access: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjA3MzgxODE2LCJqdGkiOiJmMjAyZTZmYjYzMzU0NzQ1YmNjZDJhYWQwYWNkZTg0OCIsInVzZXJfaWQiOjF9.u_GyCyr5S6UQAl6DRf4WotcL6zg0yIz8UKCXy7wQveM"
                   refresh: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYwNzQ2NzkxNiwianRpIjoiN2E3YWFhMzYwMzQyNGYxMzlhZjNlNDk1NmFhMjZlNzQiLCJ1c2VyX2lkIjoxfQ.QBpYG8MsOnkLKorYAD41PnnvwXmvXDPUj_UtkaWlmCo"
-  /token/refresh:
+  /token/refresh/:
     post:
       operationId: refresh-token
       summary: "Get an access token from a refresh token."
@@ -47,7 +47,7 @@ paths:
                 properties:
                   access:
                     type: string
-  '/organizations/{orgId}/contacts':
+  '/organizations/{orgId}/contacts/':
     get:
       tags: []
       operationId: get-organization-contacts
@@ -79,12 +79,12 @@ paths:
           application/json:
             $ref: "#components/schemas/ContactAddition"
       responses:
-        '200':
+        '201':
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ResourceAdditionResponse"
-  '/organizations/{orgId}/contacts/{contactId}':
+  '/organizations/{orgId}/contacts/{contactId}/':
     get:
       tags: []
       operationId: get-organization-contact
@@ -153,7 +153,7 @@ paths:
             application/json:
               schema:
                 $ref:  "#/components/schemas/ResourceDeletionResponse"
-  '/organizations/{orgId}/contacts/{contactId}/notes':
+  '/organizations/{orgId}/contacts/{contactId}/notes/':
     post:
       operationId: add-contact-note
       summary: "Add a note for a contact."
@@ -174,13 +174,13 @@ paths:
             schema:
               $ref: "#/components/schemas/NoteAddition"
       responses:
-        '200':
+        '201':
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ResourceAdditionResponse"
 
-  '/organizations/{orgId}/contacts/{contactId}/notes/{noteId}':
+  '/organizations/{orgId}/contacts/{contactId}/notes/{noteId}/':
     delete:
       tags: []
       operationId: delete-contact-note
@@ -207,7 +207,7 @@ paths:
             application/json:
               schema:
                 $ref:  "#/components/schemas/ResourceDeletionResponse"
-  '/organizations/{orgId}/members':
+  '/organizations/{orgId}/members/':
     get:
       tags: []
       operationId: get-organization-members
@@ -225,7 +225,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Members"
 
-  '/organizations/{orgId}/members/{memberId}':
+  '/organizations/{orgId}/members/{memberId}/':
     get:
       tags: []
       operationId: get-organization-member
@@ -258,7 +258,7 @@ paths:
               schema:
                 $ref:  "#/components/schemas/ResourceDeletionResponse"
 
-  '/organizations/{orgId}/requests':
+  '/organizations/{orgId}/requests/':
     get:
       tags: []
       operationId: get-organization-requests
@@ -290,13 +290,13 @@ paths:
           application/json:
             $ref: "#/components/schemas/MembershipRequestAddition"
       responses:
-        '200':
+        '201':
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ResourceAdditionResponse"
 
-  '/organizations/{orgId}/requests/{requestId}':
+  '/organizations/{orgId}/requests/{requestId}/':
     get:
       tags: []
       operationId: get-membership-request
@@ -370,7 +370,7 @@ paths:
             application/json:
               schema:
                 $ref:  "#/components/schemas/ResourceDeletionResponse"
-  /users:
+  /users/:
     post:
       operationId: register-account
       summary: "Register for an account."
@@ -380,12 +380,12 @@ paths:
             schema:
               $ref: "#/components/schemas/UserAddition"
       responses:
-        '200':
+        '201':
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ResourceAdditionResponse"
-  '/users/{userId}':
+  '/users/{userId}/':
     get:
       operationId: get-user
       summary: "Get information about a user."
@@ -418,7 +418,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref:  "#/components/schemas/ResourceAdditionResponse"
+                $ref:  "#/components/schemas/ResourceUpdateResponse"
     delete:
       operationId: delete-user
       summary: "Delete an account."
@@ -434,7 +434,7 @@ paths:
             application/json:
               schema:
                 $ref:  "#/components/schemas/ResourceDeletionResponse"
-  '/users/{userId}/notifications':
+  '/users/{userId}/notifications/':
     get:
       operationId: get-user-notifications
       summary: "Get a list of notifications for a user."
@@ -451,7 +451,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Notifications"
 
-  '/users/{userId}/notifications/{notificationId}':
+  '/users/{userId}/notifications/{notificationId}/':
     get:
       tags: []
       operationId: get-user-notification
