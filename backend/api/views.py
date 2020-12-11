@@ -1,11 +1,12 @@
 from django.db.utils import IntegrityError
-from rest_framework import authentication, permissions, status
-from rest_framework.permissions import AllowAny
+from rest_framework import authentication, status
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 import api.models as models
 import api.serializers as serializers
+import api.permissions as permissions
 # TODO input validation
 
 
@@ -13,12 +14,21 @@ class ContactsView(APIView):
     """
     /organizations/{orgId}/contacts/
     """
-    def get(self):
+    permission_classes = [permissions.IsOrganizationMember]
+    allowed_methods = ['GET', 'POST']
+
+    def get(self, request, orgId):
         # TODO
+        obj = {'orgId': orgId}
+        self.check_object_permissions(request, obj)
+
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def post(self):
+    def post(self, request, orgId):
         # TODO
+        obj = {'orgId': orgId}
+        self.check_object_permissions(request, obj)
+
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -26,16 +36,28 @@ class ContactView(APIView):
     """
     /organizations/{orgId}/contacts/{contactId}/
     """
-    def get(self):
+    permission_classes = [permissions.IsOrganizationMember]
+    allowed_methods = ['GET', 'POST', 'DELETE']
+
+    def get(self, request, orgId, contactId):
         # TODO
+        obj = {'orgId': orgId}
+        self.check_object_permissions(request, obj)
+
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def post(self):
+    def post(self, request, orgId, contactId):
         # TODO
+        obj = {'orgId': orgId}
+        self.check_object_permissions(request, obj)
+
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def delete(self):
+    def delete(self, request, orgId, contactId):
         # TODO
+        obj = {'orgId': orgId}
+        self.check_object_permissions(request, obj)
+
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -43,8 +65,14 @@ class ContactNotesView(APIView):
     """
     /organizations/{orgId}/contacts/{contactId}/notes/
     """
-    def post(self):
+    permission_classes = [permissions.IsOrganizationMember]
+    allowed_methods = ['POST']
+
+    def post(self, request, orgId, contactId):
         # TODO
+        obj = {'orgId': orgId}
+        self.check_object_permissions(request, obj)
+
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -52,8 +80,14 @@ class ContactNoteView(APIView):
     """
     /organizations/{orgId}/contacts/{contactId}/notes/{noteId}/
     """
-    def delete(self):
+    permission_classes = [permissions.IsOrganizationMember]
+    allowed_methods = ['DELETE']
+
+    def delete(self, request, orgId, contactId, noteId):
         # TODO
+        obj = {'orgId': orgId}
+        self.check_object_permissions(request, obj)
+
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -61,8 +95,14 @@ class MembersView(APIView):
     """
     /organizations/{orgId}/members/
     """
-    def get(self):
+    permission_classes = [permissions.IsOrganizationMember]
+    allowed_methods = ['GET']
+
+    def get(self, request, orgId):
         # TODO
+        obj = {'orgId': orgId}
+        self.check_object_permissions(request, obj)
+
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -70,12 +110,21 @@ class MemberView(APIView):
     """
     /organizations/{orgId}/members/{memberId}/
     """
-    def get(self):
+    permission_classes = [permissions.IsOrganizationAdminOrReadOnly]
+    allowed_methods = ['GET', 'DELETE']
+
+    def get(self, request, orgId, memberId):
         # TODO
+        obj = {'orgId': orgId}
+        self.check_object_permissions(request, obj)
+
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def delete(self):
+    def delete(self, request, orgId, memberId):
         # TODO
+        obj = {'orgId': orgId}
+        self.check_object_permissions(request, obj)
+
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -83,12 +132,21 @@ class RequestsView(APIView):
     """
     /organizations/{orgId}/requests/
     """
-    def get(self):
+    permission_classes = [permissions.IsOrganizationAdminOrPostOnly]
+    allowed_methods = ['GET', 'POST']
+
+    def get(self, request, orgId):
         # TODO
+        obj = {'orgId': orgId}
+        self.check_object_permissions(request, obj)
+
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def post(self):
+    def post(self, request, orgId):
         # TODO
+        obj = {'orgId': orgId}
+        self.check_object_permissions(request, obj)
+
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -96,16 +154,28 @@ class RequestView(APIView):
     """
     /organizations/{orgId}/requests/{requestId}/
     """
-    def get(self):
+    permission_classes = [permissions.IsOrganizationAdmin]
+    allowed_methods = ['GET', 'POST', 'DELETE']
+
+    def get(self, request, orgId, requestId):
         # TODO
+        obj = {'orgId': orgId}
+        self.check_object_permissions(request, obj)
+
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def post(self):
+    def post(self, request, orgId, requestId):
         # TODO
+        obj = {'orgId': orgId}
+        self.check_object_permissions(request, obj)
+
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def delete(self):
+    def delete(self, request, orgId, requestId):
         # TODO
+        obj = {'orgId': orgId}
+        self.check_object_permissions(request, obj)
+
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -114,6 +184,7 @@ class UsersView(APIView):
     /users/
     """
     permission_classes = [AllowAny]
+    allowed_methods = ['POST']
 
     def post(self, request, format=None):
         data = serializers.UserAdditionSerializer(data=request.data)
@@ -149,11 +220,20 @@ class UserView(APIView):
     """
     /users/{userId}/
     """
-    def get(self):
+    permission_classes = [permissions.OwnsAccount]
+    allowed_methods = ['GET', 'POST', 'DELETE']
+
+    def get(self, request, userId):
         # TODO
+        obj = {'userId': userId}
+        self.check_object_permissions(request, obj)
+
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def post(self, request, userId, format=None):
+    def post(self, request, userId):
+        obj = {'userId': userId}
+        self.check_object_permissions(request, obj)
+
         user = request.user
         if userId != user.uuid:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -177,7 +257,11 @@ class UserView(APIView):
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self):
+    def delete(self, request, userId):
+        # TODO
+        obj = {'userId': userId}
+        self.check_object_permissions(request, obj)
+
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -185,8 +269,14 @@ class NotificationsView(APIView):
     """
     /users/{userId}/notifications/
     """
-    def get(self):
+    permission_classes = [permissions.OwnsAccount]
+    allowed_methods = ['GET']
+
+    def get(self, request, userId):
         # TODO
+        obj = {'userId': userId}
+        self.check_object_permissions(request, obj)
+
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
@@ -194,10 +284,19 @@ class NotificationView(APIView):
     """
     /users/{userId}/notifications/{notificationId}/
     """
-    def get(self):
+    permission_classes = [permissions.OwnsAccount]
+    allowed_methods = ['GET', 'DELETE']
+
+    def get(self, request, userId, notificationId):
         # TODO
+        obj = {'userId': userId}
+        self.check_object_permissions(request, obj)
+
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    def delete(self):
+    def delete(self, request, userId, notificationId):
         # TODO
+        obj = {'userId': userId}
+        self.check_object_permissions(request, obj)
+
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

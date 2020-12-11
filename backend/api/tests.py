@@ -75,7 +75,9 @@ class CreateUserTestCase(TransactionTestCase):
         self.assertFalse('errorMessage' in response_body)
 
         # Test User exists
-        self.assertEquals(models.User.objects.filter(email='tim2@example.com').count(),
+        self.assertEquals(models.User.objects
+                          .filter(email='tim2@example.com')
+                          .count(),
                           1)
 
     def test_add_user_duplicate(self):
@@ -99,7 +101,9 @@ class CreateUserTestCase(TransactionTestCase):
         self.assertTrue('errorMessage' in response_body)
 
         # Test User exists
-        self.assertEquals(models.User.objects.filter(email='tim@example.com').count(),
+        self.assertEquals(models.User.objects
+                          .filter(email='tim@example.com')
+                          .count(),
                           1)
 
     def test_add_user_no_password(self):
@@ -114,7 +118,9 @@ class CreateUserTestCase(TransactionTestCase):
         self.assertEquals(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         # Test User exists
-        self.assertEquals(models.User.objects.filter(email='tim3@example.com').count(),
+        self.assertEquals(models.User.objects
+                          .filter(email='tim3@example.com')
+                          .count(),
                           0)
 
 
