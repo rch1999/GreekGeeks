@@ -36,6 +36,7 @@ class ContactRank(models.Model):
 
 class ContactMethod(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4)
+    contact = models.ForeignKey(Contact, models.DO_NOTHING)
     medium = models.CharField(max_length=100)
     value = models.CharField(max_length=100)
 
@@ -77,7 +78,11 @@ class UserManager(BaseUserManager):
         )
 
         user.set_password(password)
-        user.save()
+
+        if 'first_name' in kwargs:
+            user.first_name = kwargs['first_name']
+        if 'last_name' in kwargs:
+            user.last_name = kwargs['last_name']
 
         return user
 

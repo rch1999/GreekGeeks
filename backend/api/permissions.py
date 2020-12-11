@@ -3,6 +3,9 @@ from rest_framework import permissions
 
 class IsOrganizationAdmin(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
+        if not(request.user and request.user.is_authenticated):
+            return False
+
         orgId = obj['orgId']
         user = request.user
         is_admin = user.admin_of.filter(uuid=orgId).count() > 0
@@ -11,6 +14,9 @@ class IsOrganizationAdmin(permissions.BasePermission):
 
 class IsOrganizationMember(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
+        if not(request.user and request.user.is_authenticated):
+            return False
+
         orgId = obj['orgId']
         user = request.user
         is_member = user.member_of.filter(uuid=orgId).count() > 0
@@ -21,16 +27,22 @@ class IsOrganizationAdminOrReadOnly(permissions.BasePermission):
     SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
 
     def has_object_permission(self, request, view, obj):
+        if not(request.user and request.user.is_authenticated):
+            return False
+
         orgId = obj['orgId']
         user = request.user
         is_member = user.member_of.filter(uuid=orgId).count() > 0
         is_admin = user.admin_of.filter(uuid=orgId).count() > 0
 
-        return (is_member and request.method in SAFE_METHODS) or is_admin
+        return (is_member and request.method in IsOrganizationAdminOrReadOnly.SAFE_METHODS) or is_admin
 
 
 class IsOrganizationAdminOrPostOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
+        if not(request.user and request.user.is_authenticated):
+            return False
+
         orgId = obj['orgId']
         user = request.user
         is_admin = user.admin_of.filter(uuid=orgId).count() > 0
@@ -40,5 +52,8 @@ class IsOrganizationAdminOrPostOnly(permissions.BasePermission):
 
 class OwnsAccount(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
+        if not(request.user and request.user.is_authenticated):
+            return False
+
         userId = obj['userId']
         return userId == request.user.uuid

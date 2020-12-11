@@ -19,6 +19,8 @@ urlpatterns = [
          views.ContactView.as_view(), name='contact'),
     path('organizations/<uuid:orgId>/contacts/<uuid:contactId>/notes/',
          views.ContactNoteView.as_view(), name='contact_notes'),
+    path('organizations/<uuid:orgId>/members/',
+         views.MembersView.as_view(), name='members'),
     path('organizations/<uuid:orgId>/members/<uuid:memberId>/',
          views.MemberView.as_view(), name='member'),
     path('organizations/<uuid:orgId>/requests/',

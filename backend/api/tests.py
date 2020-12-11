@@ -3,25 +3,83 @@ from django.contrib.auth.hashers import check_password
 from rest_framework.test import APIClient
 from rest_framework import status
 import api.models as models
+import uuid
 
 
-class TokenTestCase(TransactionTestCase):
-    def setUp(self):
-        self.client = APIClient()
-        models.User.objects.create_user(
+class ApiBaseTestCase(TransactionTestCase):
+    PASS = 'hunter2'
+
+    def make_org1(self):
+        org = models.Organization(
+            institution='School 1',
+            organization_name='Organization 1',
+            chapter_name='Chapter 1'
+        )
+        return org
+
+    def make_org2(self):
+        org = models.Organization(
+            institution='School 2',
+            organization_name='Organization 2',
+            chapter_name='Chapter 2'
+        )
+        return org
+
+    def make_user1(self):
+        user = models.User.objects.create_user(
             first_name='Tim',
             last_name='Clough',
             email='tim@example.com',
-            password='hunter2'
+            password=ApiBaseTestCase.PASS
         )
+        return user
+
+    def make_user2(self):
+        user = models.User.objects.create_user(
+            first_name='Bilbo',
+            last_name='Baggins',
+            email='baggins@shire.com',
+            password=ApiBaseTestCase.PASS
+        )
+        return user
+
+    def make_contact1(self, org, user):
+        contact = models.Contact(
+            organization=org,
+            created_by=user,
+            first_name='Joe',
+            last_name='Schmoe'
+        )
+        return contact
+
+    def make_contact2(self, org, user):
+        contact = models.Contact(
+            organization=org,
+            created_by=user,
+            first_name='Caleb',
+            last_name='Smith'
+        )
+        return contact
+
+
+class TokenTestCase(ApiBaseTestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = self.make_user1()
+        self.user.save()
+
+        self.user2 = self.make_user2()
 
     def test_token_valid_credentials(self):
         data = {
-            'email': 'tim@example.com',
-            'password': 'hunter2'
+            'email': self.user.email,
+            'password': ApiBaseTestCase.PASS
         }
 
-        response = self.client.post('/api/token/', data)
+        response = self.client.post(
+            '/api/token/',
+            data
+        )
         self.assertEquals(response.status_code, status.HTTP_200_OK)
 
         response_body = response.data
@@ -31,11 +89,14 @@ class TokenTestCase(TransactionTestCase):
 
     def test_token_invalid_credentials(self):
         data = {
-            'email': 'tim2@example.com',
-            'password': 'hunter2'
+            'email': self.user2.email,
+            'password': ApiBaseTestCase.PASS
         }
 
-        response = self.client.post('/api/token/', data)
+        response = self.client.post(
+            '/api/token/',
+            data
+        )
         self.assertEquals(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         response_body = response.data
@@ -44,22 +105,82 @@ class TokenTestCase(TransactionTestCase):
         self.assertTrue('refresh' not in response_body)
 
 
-class CreateUserTestCase(TransactionTestCase):
+class ContactsTestCase(ApiBaseTestCase):
     def setUp(self):
         self.client = APIClient()
-        models.User.objects.create_user(
-            first_name='Tim',
-            last_name='Clough',
-            email='tim@example.com',
-            password='hunter2'
+
+        self.org = self.make_org1()
+        self.org.save()
+        self.user = self.make_user1()
+        self.user.save()
+        self.org.users.add(self.user)
+        self.org.save()
+        self.contact = self.make_contact1(self.org, self.user)
+        self.contact.save()
+
+        self.contact2 = self.make_contact2(self.org, self.user)
+
+        # Get access token
+        data = {
+            'email': self.user.email,
+            'password': ApiBaseTestCase.PASS
+        }
+
+        response = self.client.post(
+            '/api/token/',
+            data
         )
+        access = response.data['access']
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {access}')
+
+    def test_get_contacts(self):
+        response = self.client.get(
+            f'/api/organizations/{self.org.uuid}/contacts/'
+        )
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(len(response.data), 1)
+
+    def test_post_contacts(self):
+        data = {
+            'first_name': self.contact2.first_name,
+            'last_name': self.contact2.last_name,
+            'organization_uuid': self.org.uuid
+        }
+        response = self.client.post(
+            f'/api/organizations/{self.org.uuid}/contacts/',
+            data
+        )
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+        response_body = response.data
+        self.assertTrue('success' in response_body)
+        self.assertEquals(response_body['success'], True)
+
+        self.assertTrue('uuid' in response_body)
+        self.assertFalse('errorMessage' in response_body)
+
+        # test contact exists
+        self.assertEquals(
+            models.Organization.objects.get(uuid=self.org.uuid) \
+                .contact_set.filter(uuid=response_body['uuid']).count(),
+            1
+        )
+
+
+class CreateUserTestCase(ApiBaseTestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = self.make_user1()
+        self.user.save()
+
+        # not saved
+        self.user2 = self.make_user2()
 
     def test_add_user_successful(self):
         data = {
-            'first_name': 'Tim',
-            'last_name': 'Clough',
-            'email': 'tim2@example.com',
-            'password': 'hunter2'
+            'first_name': self.user2.first_name,
+            'last_name': self.user2.last_name,
+            'email': self.user2.email,
+            'password': ApiBaseTestCase.PASS
         }
 
         # Should succeed
@@ -76,16 +197,16 @@ class CreateUserTestCase(TransactionTestCase):
 
         # Test User exists
         self.assertEquals(models.User.objects
-                          .filter(email='tim2@example.com')
+                          .filter(email=self.user2.email)
                           .count(),
                           1)
 
     def test_add_user_duplicate(self):
         data = {
-            'first_name': 'Tim',
-            'last_name': 'Clough',
-            'email': 'tim@example.com',
-            'password': 'hunter2'
+            'first_name': self.user.first_name,
+            'last_name': self.user.last_name,
+            'email': self.user.email,
+            'password': ApiBaseTestCase.PASS
         }
 
         # Should fail
@@ -108,9 +229,9 @@ class CreateUserTestCase(TransactionTestCase):
 
     def test_add_user_no_password(self):
         data = {
-            'first_name': 'Tim',
-            'last_name': 'Clough',
-            'email': 'tim3@example.com',
+            'first_name': self.user2.first_name,
+            'last_name': self.user2.last_name,
+            'email': self.user2.email,
         }
 
         # Should fail
@@ -127,17 +248,18 @@ class CreateUserTestCase(TransactionTestCase):
 class ExistingUserTestCase(TransactionTestCase):
     def setUp(self):
         self.client = APIClient()
-        models.User.objects.create_user(
+        self.user = models.User.objects.create_user(
             first_name='Tim',
             last_name='Clough',
             email='tim@example.com',
             password='hunter2'
         )
+        self.user.save()
 
         # Get access token
         data = {
-            'email': 'tim@example.com',
-            'password': 'hunter2'
+            'email': self.user.email,
+            'password': ApiBaseTestCase.PASS
         }
 
         response = self.client.post('/api/token/', data)
@@ -145,7 +267,7 @@ class ExistingUserTestCase(TransactionTestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {access}')
 
     def test_update_password(self):
-        uuid = models.User.objects.get(email='tim@example.com').uuid
+        uuid = self.user.uuid
 
         data = {
             'password': 'hunter3'

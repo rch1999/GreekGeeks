@@ -578,9 +578,7 @@ components:
     ContactAddition:
       required:
       - first_name
-      - last_name
-      - primary_contact_method
-      - rank_uuid
+      - organization_uuid
       properties:
         first_name:
           type: string
@@ -589,6 +587,9 @@ components:
         primary_contact_method:
           $ref:  "#/components/schemas/ContactMethod"
         rank_uuid:
+          type: string
+          format: uuid
+        organization_uuid:
           type: string
           format: uuid
 
@@ -616,7 +617,20 @@ components:
           format: uuid
         medium:
           type: string
-        vaule:
+        value:
+          type: string
+
+    ContactMethodAddition:
+      required:
+      - medium
+      - value
+      properties:
+        contact_uuid:
+          type: string
+          format: uuid
+        medium:
+          type: string
+        value:
           type: string
 
     ContactRank:

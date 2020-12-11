@@ -17,6 +17,20 @@ class ContactSerializer(serializers.ModelSerializer):
         ]
 
 
+class ContactMethodAdditionSerializer(serializers.Serializer):
+    contact_uuid = serializers.UUIDField(required=False)
+    medium = serializers.CharField()
+    value = serializers.CharField()
+
+
+class ContactAdditionSerializer(serializers.Serializer):
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    primary_contact_method = ContactMethodAdditionSerializer(required=False)
+    rank_uuid = serializers.UUIDField(required=False)
+    organization_uuid = serializers.UUIDField()
+
+
 class ContactRankSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.ContactRank
@@ -80,6 +94,18 @@ class UserUpdateSerializer(serializers.Serializer):
     first_name = serializers.CharField(required=False)
     last_name = serializers.CharField(required=False)
     password = serializers.CharField(required=False)
+
+
+class MemberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.User
+        lookup_field = 'uuid'
+        fields = [
+            'uuid',
+            'first_name', 
+            'last_name', 
+            'email'
+        ]
 
 
 class NotificationSerializer(serializers.ModelSerializer):
