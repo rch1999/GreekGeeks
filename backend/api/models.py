@@ -69,6 +69,8 @@ class UserManager(BaseUserManager):
     def create_user(self, email, password, **kwargs):
         if not email:
             raise ValueError('Users must have a valid email adress.')
+        if not password:
+            raise ValueError('Users must have a valid password')
 
         user = self.model(
             email=self.normalize_email(email)
@@ -106,7 +108,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     updated = models.DateTimeField(auto_now=True)
 
     objects = UserManager()
-    
+
     email_verified = models.BooleanField('Email Verified', default=False)
 
     def __str__(self):

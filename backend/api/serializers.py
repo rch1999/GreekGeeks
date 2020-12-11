@@ -76,6 +76,12 @@ class UserAdditionSerializer(serializers.Serializer):
     password = serializers.CharField()
 
 
+class UserUpdateSerializer(serializers.Serializer):
+    first_name = serializers.CharField(required=False)
+    last_name = serializers.CharField(required=False)
+    password = serializers.CharField(required=False)
+
+
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Notification
