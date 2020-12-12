@@ -126,8 +126,8 @@ class ContactView(APIView):
 
         org = models.Organization.objects.get(uuid=orgId)
         contact = org.contact_set.get(uuid=contactId)
-        org.contact_set.remove(contact)
-
+        contact.delete()
+    
         response = {
             'success': True
         }
@@ -383,7 +383,7 @@ class UserView(APIView):
         user = models.Users.objects.get(uuid=userId)
         user = serializers.UserSerializer(user)
 
-        return Response(user.data, HTTP_200_OK)
+        return Response(user.data, status.HTTP_200_OK)
 
     def post(self, request, userId):
         obj = {'userId': userId}

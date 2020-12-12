@@ -9,6 +9,23 @@ import uuid
 class ApiBaseTestCase(TransactionTestCase):
     PASS = 'hunter2'
 
+    def setUp(self):
+        self.client = APIClient()
+
+    def authorize(self, email, password):
+        data = {
+            'email': self.user.email,
+            'password': ApiBaseTestCase.PASS
+        }
+
+        response = self.client.post(
+            '/api/token/',
+            data
+        )
+
+        access = response.data['access']
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {access}')
+
     def make_org1(self):
         org = models.Organization(
             institution='School 1',
@@ -72,7 +89,7 @@ class ApiBaseTestCase(TransactionTestCase):
 
 class TokenTestCase(ApiBaseTestCase):
     def setUp(self):
-        self.client = APIClient()
+        super().setUp()
         self.user = self.make_user1()
         self.user.save()
 
@@ -115,7 +132,7 @@ class TokenTestCase(ApiBaseTestCase):
 
 class ContactsTestCase(ApiBaseTestCase):
     def setUp(self):
-        self.client = APIClient()
+        super().setUp()
 
         self.org = self.make_org1()
         self.org.save()
@@ -131,18 +148,7 @@ class ContactsTestCase(ApiBaseTestCase):
         self.rank = self.make_rank1(self.org)
         self.rank.save()
 
-        # Get access token
-        data = {
-            'email': self.user.email,
-            'password': ApiBaseTestCase.PASS
-        }
-
-        response = self.client.post(
-            '/api/token/',
-            data
-        )
-        access = response.data['access']
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {access}')
+        self.authorize(self.user.email, ApiBaseTestCase.PASS)
 
     def test_get_contacts(self):
         response = self.client.get(
@@ -176,9 +182,80 @@ class ContactsTestCase(ApiBaseTestCase):
 
         # test contact exists
         self.assertEquals(
-            models.Organization.objects.get(uuid=self.org.uuid) \
-                .contact_set.filter(uuid=response_body['uuid']).count(),
+            models.Organization.objects.get(uuid=self.org.uuid)
+                  .contact_set.filter(uuid=response_body['uuid']).count(),
             1
+        )
+
+
+class ContactTestCase(ApiBaseTestCase):
+    def setUp(self):
+        super().setUp()
+
+        self.org = self.make_org1()
+        self.org.save()
+
+        self.user = self.make_user1()
+        self.user.save()
+        self.org.users.add(self.user)
+
+        self.contact = self.make_contact1(self.org, self.user)
+        self.contact.save()
+
+        self.contact2 = self.make_contact2(self.org, self.user)
+        self.contact2.save()
+
+        self.authorize(self.user.email, ApiBaseTestCase.PASS)
+
+    def test_get_contact(self):
+        response = self.client.get(
+            f'/api/organizations/{self.org.uuid}/contacts/{self.contact.uuid}/'
+        )
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+
+        self.assertEquals(
+            uuid.UUID(response.data['uuid']),
+            self.contact.uuid
+        )
+
+    def test_post_contact(self):
+        data = {
+            'first_name': 'XYZ',
+            'last_name': 'ABC'
+        }
+        response = self.client.post(
+            f'/api/organizations/{self.org.uuid}/contacts/{self.contact.uuid}/',
+            data
+        )
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+
+        self.assertEquals(response.data['success'], True)
+
+        self.contact.refresh_from_db()
+        self.assertEquals(
+            self.contact.first_name,
+            'XYZ'
+        )
+        self.assertEquals(
+            self.contact.last_name,
+            'ABC'
+        )
+
+    def test_delete_contact(self):
+        response = self.client.delete(
+            f'/api/organizations/{self.org.uuid}/contacts/{self.contact2.uuid}/'
+        )
+
+        self.assertEquals(response.status_code, status.HTTP_200_OK)
+
+        self.assertEquals(response.data['success'], True)
+        self.assertFalse('errorMessage' in response.data)
+
+        self.assertEquals(
+            self.org.contact_set
+                .filter(uuid=self.contact2.uuid).count(),
+            0
         )
 
 
@@ -261,9 +338,10 @@ class CreateUserTestCase(ApiBaseTestCase):
                           0)
 
 
-class ExistingUserTestCase(TransactionTestCase):
+class ExistingUserTestCase(ApiBaseTestCase):
     def setUp(self):
-        self.client = APIClient()
+        super().setUp()        
+
         self.user = models.User.objects.create_user(
             first_name='Tim',
             last_name='Clough',
@@ -272,15 +350,7 @@ class ExistingUserTestCase(TransactionTestCase):
         )
         self.user.save()
 
-        # Get access token
-        data = {
-            'email': self.user.email,
-            'password': ApiBaseTestCase.PASS
-        }
-
-        response = self.client.post('/api/token/', data)
-        access = response.data['access']
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {access}')
+        self.authorize(self.user.email, ApiBaseTestCase.PASS)
 
     def test_update_password(self):
         uuid = self.user.uuid
