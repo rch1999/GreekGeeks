@@ -146,6 +146,27 @@ class OrganizationSerializer(serializers.ModelSerializer):
         ]
 
 
+class RankSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.ContactRank
+        lookup_field = 'uuid'
+        fields = [
+            'uuid',
+            'organization',
+            'name',
+            'description'
+        ]
+
+
+class RankUpdateSerializer(serializers.Serializer):
+    description = serializers.CharField()
+
+
+class RankAdditionSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    description = serializers.CharField()
+
+
 class MembershipRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.MembershipRequest

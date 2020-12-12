@@ -116,7 +116,7 @@ class ContactView(APIView):
             response = {
                 'success': True
             }
-            return Response(response, status.HTTP_200_OK)
+            return Response(response, status.HTTP_201_CREATED)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -231,6 +231,79 @@ class MemberView(APIView):
         }
 
         return Response(response, status.HTTP_200_OK)
+
+
+class RanksView(APIView):
+    """
+    /organizations/{orgId}/ranks/
+    """
+    permission_classes = [permissions.IsOrganizationAdminOrReadOnly]
+    allowed_methods = ['GET', 'POST']
+
+    def get(self, request, orgId):
+        obj = {'orgId': orgId, 'userId': None}
+        self.check_object_permissions(request, obj)
+
+        ranks = models.Organization.objects.get(uuid=orgId) \
+                      .contactrank_set.all()
+
+        ranks = serializers.RankSerializer(data=ranks, many=True)
+
+        return Response(ranks.data, status.HTTP_200_OK)
+
+    def post(self, request, orgId):
+        obj = {'orgId': orgId, 'userId': None}
+        self.check_object_permissions(request, obj)
+
+        data = serializers.RankAdditionSerializer(data=request.data)
+        if data.is_valid():
+            name = data.data['name']
+            description = data.data['description']
+
+            org = models.Organization.objects.get(uuid=orgId)
+
+            rank = models.ContactRank(
+                organization=org,
+                name=name,
+                description=description
+            )
+            rank.save()
+
+            response = {
+                'success': True,
+                'uuid': rank.uuid
+            }
+            return Response(response, status.HTTP_201_CREATED)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class RankView(APIView):
+    """
+    /organizations/{orgId}/ranks/{rankId}/
+    """
+    permission_classes = [permissions.IsOrganizationAdmin]
+    allowed_methods = ['POST']
+
+    def post(self, request, orgId, rankId):
+        obj = {'orgId': orgId, 'userId': None}
+        self.check_object_permissions(request, obj)
+
+        data = serializers.RankUpdateSerializer(data=request.data)
+        if data.is_valid():
+            description = data.data['description']
+
+            rank = models.Organization.objects.get(uuid=orgId) \
+                         .contactrank_set.get(uuid=rankId)
+            rank.description = description
+            rank.save()
+
+            response = {
+                'success': True
+            }
+            return Response(response, status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class RequestsView(APIView):

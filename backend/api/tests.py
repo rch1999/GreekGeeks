@@ -228,7 +228,7 @@ class ContactTestCase(ApiBaseTestCase):
             data
         )
 
-        self.assertEquals(response.status_code, status.HTTP_200_OK)
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
 
         self.assertEquals(response.data['success'], True)
 

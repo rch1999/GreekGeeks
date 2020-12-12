@@ -258,6 +258,66 @@ paths:
               schema:
                 $ref:  "#/components/schemas/ResourceDeletionResponse"
 
+  '/organizations/{orgId}/ranks/':
+    get:
+      operationId: get-organization-ranks
+      summary: "Get a list of ranks for an organization."
+      parameters:
+      - name: orgId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ranks"
+    post:
+      operationId: add-organization-rank
+      summary: "Add a new organization rank."
+      parameters:
+      - name: orgId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            $ref: "#/components/schemas/RankAddition"
+      responses:
+        '201':
+          content:
+            application/json:
+              $ref: "#/components/schemas/ResourceAdditionResponse"
+
+  '/organizations/{orgId}/ranks/{rankId}/':
+    post:
+      operationId: update-organization-rank
+      summary: "Update an existing organization rank."
+      parameters:
+      - name: orgId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      - name: rankId
+        in: path
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            $ref: "#/components/schemas/RankUpdate"
+      responses:
+        '201':
+          content:
+            application/json:
+              $ref: "#/components/schemas/ResourceUpdateResponse"
+
   '/organizations/{orgId}/requests/':
     get:
       tags: []
@@ -773,7 +833,17 @@ components:
         $ref: "#/components/schemas/Notification"
 
     Member:
-      $ref: "#/components/schemas/User"
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
     Members:
       type: array
       items:
@@ -825,6 +895,43 @@ components:
           $ref: "#/components/schemas/Members"
         admin_members:
           $ref: "#/components/schemas/Members"
+
+    Rank:
+      required:
+      - uuid
+      - organization
+      - name
+      - description
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        organization:
+          $ref: "#/components/schemas/Organization"
+        name:
+          type: string
+        description:
+          type: string
+    Ranks:
+      type: array
+      items:
+        $ref: "#/components/schemas/Rank"
+    RankUpdate:
+      required:
+        description:
+          type: string
+      properties:
+        description:
+          type: string
+    RankAddition:
+      required:
+      - name
+      - description
+      properties:
+        name:
+          type: string
+        description:
+          type: string
 
     Task:
       required:
