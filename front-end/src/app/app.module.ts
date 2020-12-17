@@ -10,6 +10,13 @@ import { NavbarComponent } from './navbar/navbar.component';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { OrganizationComponent } from './organization/organization.component';
+import { FeedComponent } from './feed/feed.component';
+import { StoreService } from './services/store.service';
+import { ContactComponent } from './contact/contact.component';
+import { ContactlistComponent } from './contactlist/contactlist.component';
+import { ActivityComponent } from './activity/activity.component';
+import { FeedbarComponent } from './feedbar/feedbar.component';
+import { ContactbarComponent } from './contactbar/contactbar.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +25,13 @@ import { OrganizationComponent } from './organization/organization.component';
     LoginComponent,
     AboutComponent,
     NavbarComponent,
-    OrganizationComponent
+    OrganizationComponent,
+    FeedComponent,
+    ContactComponent,
+    ContactlistComponent,
+    ActivityComponent,
+    FeedbarComponent,
+    ContactbarComponent
   ],
   imports: [
     BrowserModule,
@@ -26,7 +39,7 @@ import { OrganizationComponent } from './organization/organization.component';
     RouterModule.forRoot(appRoutes),
     FormsModule
   ],
-  providers: [],
+  providers: [StoreService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

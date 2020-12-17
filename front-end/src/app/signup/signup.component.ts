@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { User } from '../models/user.model';
+import { StoreService } from '../services/store.service';
 // import { AuthService } from '../services/auth/auth.service';
 
 @Component({
@@ -14,20 +15,13 @@ export class SignupComponent {
   @Input() password: string;
   @Input() displayName: string;
   errorMsg: string;
-
-  instructions: string = 'Please make sure that:\n (1) Your email is valid \n ' +
-  '(2) Your password is at least 6 characters and \n (3) Your display name is at ' +
-  'least 12 characters long';
-  constructor(private router: Router) { }
+  constructor(private router: Router,
+              private store: StoreService) { }
 
     signUp() {
-      const user: User = {
-        email: this.email,
-        password: this.password,
-        username: this.displayName
-      };
-
-      // this is where we would register the user
+      this.store.logIn();
+      this.router.navigateByUrl('/feed');
+      console.log(this.store.getLoggedIn());
     }
 
     handleError(errMessage: string): void {

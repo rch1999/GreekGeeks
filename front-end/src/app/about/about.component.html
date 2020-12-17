@@ -1,3 +1,4 @@
+<app-navbar></app-navbar>
 <div class="container">
     <div class="aboutCard doHyeon">
       <h2 class="heading">About Chapter Builder</h2>
@@ -18,7 +19,7 @@
     </div>
     <div *ngIf="anyToggles()" class="extrasCard doHyeon">
         <span class="extra">
-            <label *ngIf="showTech()">Made with Angular 8 and Django.</label>
+            <label *ngIf="showTech()">Made with Angular 10, Django and MySQL.</label>
         </span>
         <span class="extra">  
             <label *ngIf="showContributors()" >Contributors: Zachary Ward, Ryan Helmann, Tim Clough,
@@ -26,7 +27,7 @@
             </label>
         </span>
         <span class="extra">
-            <mark *ngIf="showFeatures()">FEATURES: Auth (IP), Organization Feed (IP) </mark>
+            <mark *ngIf="showFeatures()">FEATURES: Auth (IP), Contact List (IP), Organization Feed (IP) </mark>
         </span>
     </div>
   </div>

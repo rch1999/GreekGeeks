@@ -1,0 +1,27 @@
+.activityItem{
+    height: auto;
+    padding: 10px;
+    width: 400px;
+    margin-top: 10px;
+    margin-right: 10px;
+    border-radius: 1px;
+    align-items:flex-start;
+    background-color: #0a98eb;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    color: #ffffff;
+    border-radius: 32px;
+    transition: ease-in 0.2s;
+    font-family: 'Do Hyeon', sans-serif;
+}
+
+.activityItem:hover {
+    border: 4px solid rgb(255, 255, 255);
+    transition: ease-in 0.2s;
+}
+
+.type{
+    background-color: orange;
+    border-radius: 32px;
+    padding-left: 4px;
+    width: 3.5vw;
+}
