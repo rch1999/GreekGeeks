@@ -85,8 +85,8 @@ class UserSerializer(serializers.ModelSerializer):
         lookup_field = 'uuid'
         fields = [
             'uuid',
-            'first_name', 
-            'last_name', 
+            'first_name',
+            'last_name',
             'email',
             'is_admin',
             'is_staff',
@@ -114,8 +114,8 @@ class MemberSerializer(serializers.ModelSerializer):
         lookup_field = 'uuid'
         fields = [
             'uuid',
-            'first_name', 
-            'last_name', 
+            'first_name',
+            'last_name',
             'email'
         ]
 

@@ -1,3 +1,7 @@
+"""
+REST API for GreekGeeks. Refer to the OpenAPI spec for details about request
+and response bodies.
+"""
 from django.db.utils import IntegrityError
 from rest_framework import authentication, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -9,6 +13,7 @@ import api.serializers as serializers
 import api.permissions as permissions
 # TODO input validation
 # TODO database failure responses (e.g. actually handle instead of 500'ing)
+# TODO notifications
 
 
 class ContactsView(APIView):
@@ -22,6 +27,7 @@ class ContactsView(APIView):
         obj = {'orgId': orgId}
         self.check_object_permissions(request, obj)
 
+        # get the contacts and serialize
         contacts = models.Organization.objects.get(uuid=orgId) \
                          .contact_set.all()
         contacts = serializers.ContactSerializer(contacts, many=True)
@@ -39,6 +45,7 @@ class ContactsView(APIView):
 
             first_name = data.data['first_name']
 
+            # create contact and update with optional fields
             contact = models.Contact(
                 organization=org,
                 created_by=request.user,
@@ -83,6 +90,7 @@ class ContactView(APIView):
         obj = {'orgId': orgId}
         self.check_object_permissions(request, obj)
 
+        # get the contact and serialize
         contact = models.Organization.objects.get(uuid=orgId) \
                         .contact_set.get(uuid=contactId)
         contact = serializers.ContactSerializer(contact)
@@ -98,6 +106,7 @@ class ContactView(APIView):
             contact = models.Organization.objects.get(uuid=orgId) \
                         .contact_set.get(uuid=contactId)
 
+            # update contact with new fields
             if 'first_name' in data.data:
                 contact.first_name = data.data['first_name']
             if 'last_name' in data.data:
@@ -124,10 +133,11 @@ class ContactView(APIView):
         obj = {'orgId': orgId}
         self.check_object_permissions(request, obj)
 
+        # get contact and delete
         org = models.Organization.objects.get(uuid=orgId)
         contact = org.contact_set.get(uuid=contactId)
         contact.delete()
-    
+
         response = {
             'success': True
         }
@@ -147,6 +157,7 @@ class ContactNotesView(APIView):
 
         data = serializers.ContactNoteAdditionSerializer(data=request.data)
         if data.is_valid():
+            # get contact, and create a note corresponding to it
             contact = models.Organization.get(uuid=orgId) \
                         .contacts_set.get(uuid=contactId)
             body = data.data['body']
@@ -177,10 +188,15 @@ class ContactNoteView(APIView):
         obj = {'orgId': orgId}
         self.check_object_permissions(request, obj)
 
+        # get the note, and delete it
         contact = models.Organization.objects.get(uuid=orgId) \
                         .contact_set.get(uuid=contactId)
         note = contact.contactnote_set.get(uuid=noteId)
-        contact.contact_set.remove(note)
+        note.delete()
+        response = {
+            'success': True
+        }
+        return Response(response, status.HTTP_200_OK)
 
 
 class MembersView(APIView):
@@ -223,6 +239,7 @@ class MemberView(APIView):
         obj = {'orgId': orgId}
         self.check_object_permissions(request, obj)
 
+        # only remove the user from the organization, don't delete the user!
         models.Organization.objects.get(uuid=orgId) \
             .users.remove(request.user)
 
@@ -329,7 +346,8 @@ class RequestsView(APIView):
         )
         if data.is_valid():
             user_uuid = data['user_uuid']
-            # make sure user uuid matches data uuid
+            # we check the object permissions late here because we need
+            # the user id from the request object
             obj = {'orgId': orgId, 'userId': user_uuid}
             self.check_object_permissions(request, obj)
 
@@ -391,12 +409,13 @@ class RequestView(APIView):
 
     def delete(self, request, orgId, requestId):
         org = models.Organizations.objects.get(uuid=orgId)
-        request = org.membershiprequest_set.get(uuid=requestId)
+        mr = org.membershiprequest_set.get(uuid=requestId)
 
-        obj = {'orgId': orgId, 'userId': request.user.uuid}
+        obj = {'orgId': orgId, 'userId': mr.user.uuid}
         self.check_object_permissions(request, obj)
 
-        org.membershiprequest_set.remove(request)
+        # actually delete the object
+        mr.delete()
 
         response = {
             'success': True
@@ -489,6 +508,7 @@ class UserView(APIView):
         obj = {'userId': userId}
         self.check_object_permissions(request, obj)
 
+        # actually delete the user
         user = models.Users.objects.get(uuid=userId)
         user.delete()
 
@@ -543,7 +563,9 @@ class NotificationView(APIView):
 
         notification = models.User.objects.get(uuid=userId) \
                              .notification_set.get(uuid=notificationId)
+        notification.delete()
 
-        notification = serializers.NotificationSerializer(notification.data)
-
-        return Response(notification.data, status.HTTP_200_OK)
+        response = {
+            'success': True
+        }
+        return Response(response, status.HTTP_200_OK)
