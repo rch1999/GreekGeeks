@@ -33,6 +33,8 @@ urlpatterns = [
          views.RequestView.as_view(), name='request'),
     path('users/',
          views.UsersView.as_view(), name='users'),
+    path('users/email/',
+         views.EmailVerificationView.as_view(), name='user_emails'),
     path('users/<uuid:userId>/',
          views.UserView.as_view(), name='user'),
     path('users/<uuid:userId>/notifications/',

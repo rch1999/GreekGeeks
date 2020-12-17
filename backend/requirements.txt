@@ -9,3 +9,4 @@ pillow
 uritemplate
 pyyaml
 six
+requests

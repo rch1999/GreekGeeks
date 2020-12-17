@@ -3,6 +3,7 @@ REST API for GreekGeeks. Refer to the OpenAPI spec for details about request
 and response bodies.
 """
 from django.db.utils import IntegrityError
+from django.core.mail import send_mail
 from rest_framework import authentication, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -11,6 +12,9 @@ from rest_framework.views import APIView
 import api.models as models
 import api.serializers as serializers
 import api.permissions as permissions
+from api.tokens import email_verification_token_generator
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 # TODO input validation
 # TODO database failure responses (e.g. actually handle instead of 500'ing)
 # TODO notifications
@@ -443,6 +447,7 @@ class UsersView(APIView):
                                                        password,
                                                        first_name=first_name,
                                                        last_name=last_name)
+                user.is_active = False
                 user.save()
             except IntegrityError:
                 response = {
@@ -456,6 +461,57 @@ class UsersView(APIView):
                     'success': True
                 }
                 code = status.HTTP_201_CREATED
+
+            # send email
+            token = email_verification_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.uuid))
+            url = f'{request.get_host()}/verify?uidb64={uid}&token={token}'
+            send_mail(
+                'Verify your GreekGeeks Account',
+                url,
+                'donotreply@greekgeeks.com',
+                [email]
+            )
+            return Response(response, code)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class EmailVerificationView(APIView):
+    """
+    /users/email/
+    """
+    permission_classes = [AllowAny]
+    allowed_methods = ['POST']
+
+    def post(self, request, format=None):
+        data = serializers.EmailVerificationSerializer(data=request.data)
+        if data.is_valid():
+            uidb64 = data.data['uidb64']
+            token = data.data['token']
+
+            try:
+                uuid = force_text(urlsafe_base64_decode(uidb64))
+                user = models.User.objects.get(uuid=uuid)
+            except (TypeError, ValueError, OverflowError,
+                    models.User.DoesNotExist):
+                user = None
+
+            if user is not None and \
+               email_verification_token_generator.check_token(user, token):
+                user.is_active = True
+                user.save()
+
+                response = {
+                    'success': True
+                }
+                code = status.HTTP_200_OK
+            else:
+                response = {
+                    'success': False
+                }
+                code = status.HTTP_400_BAD_REQUEST
+
             return Response(response, code)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)

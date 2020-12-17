@@ -95,6 +95,11 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
 
+class EmailVerificationSerializer(serializers.Serializer):
+    uidb64 = serializers.CharField()
+    token = serializers.CharField()
+
+
 class UserAdditionSerializer(serializers.Serializer):
     first_name = serializers.CharField()
     last_name = serializers.CharField()

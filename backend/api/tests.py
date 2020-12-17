@@ -49,6 +49,7 @@ class ApiBaseTestCase(TransactionTestCase):
             email='tim@example.com',
             password=ApiBaseTestCase.PASS
         )
+        user.is_active = True
         return user
 
     def make_user2(self):
@@ -58,6 +59,7 @@ class ApiBaseTestCase(TransactionTestCase):
             email='baggins@shire.com',
             password=ApiBaseTestCase.PASS
         )
+        user.is_active = True
         return user
 
     def make_contact1(self, org, user):
@@ -348,6 +350,7 @@ class ExistingUserTestCase(ApiBaseTestCase):
             email='tim@example.com',
             password='hunter2'
         )
+        self.user.is_active = True
         self.user.save()
 
         self.authorize(self.user.email, ApiBaseTestCase.PASS)

@@ -430,6 +430,21 @@ paths:
             application/json:
               schema:
                 $ref:  "#/components/schemas/ResourceDeletionResponse"
+  /users/email/:
+    post:
+      operationId: verify-email
+      summary: "Verify a user's email"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailVerification"
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResourceUpdateResponse"
   /users/:
     post:
       operationId: register-account
@@ -808,6 +823,12 @@ components:
         last_name:
           type: string
         password:
+          type: string
+    EmailVerification:
+      properties:
+        uidb64:
+          type: string
+        token:
           type: string
 
     Notification:
