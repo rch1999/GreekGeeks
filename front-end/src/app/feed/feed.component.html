@@ -1,0 +1,51 @@
+<app-navbar></app-navbar>
+<div class='flexbox'>
+    <div>
+        <app-contactbar></app-contactbar>
+        <app-contactlist></app-contactlist>
+    </div>
+        
+    <div>
+        <app-feedbar></app-feedbar>
+        <app-activity
+        [header]="activities[0].header"
+        [text]="activities[0].text"
+        [type]="activities[0].type"
+        
+        >
+
+        </app-activity>
+        <app-activity
+        [header]="activities[1].header"
+        [text]="activities[1].text"
+        [type]="activities[1].type"
+        
+        >
+
+        </app-activity>
+        <app-activity
+        [header]="activities[2].header"
+        [text]="activities[2].text"
+        [type]="activities[2].type"
+        
+        >
+
+        </app-activity>
+    </div>
+    <div></div>
+  </div>
+
+
+
+<!-- <div class="container doHyeon"> -->
+    <!-- <app-contactlist></app-contactlist> -->
+    <!-- <app-activity
+        [header]="activities[0].header"
+        [text]="activities[0].text"
+        [type]="activities[0].type"
+    
+    >
+    </app-activity>
+</div> -->
+
+

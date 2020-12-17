@@ -2,16 +2,16 @@
     <div id="logo"></div>
   <div class="links">
     <span>
-      <a routerLink="/login">Login</a>
+      <a *ngIf="!auth" routerLink="/login">Login</a>
     </span>
     <span>
-      <a routerLink="/signup">Sign Up</a>
+      <a *ngIf="!auth" routerLink="/signup">Sign Up</a>
     </span>
     <span>
       <a routerLink="/about">About Chapter Builder</a>
     </span>
     <span>
-      <a href="#" (click)="logout()">Logout</a>
+      <a *ngIf="auth" href="#" (click)="logout()">Logout</a>
     </span>
   </div>
 </div>

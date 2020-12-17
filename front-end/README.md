@@ -1,10 +1,13 @@
-# FrontEnd
+# GreekGeeks FrontEnd
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 10.0.8.
+This repository contains the front end code for GreekGeeks. All of the designing for GreekGeeks
+along with unit tests and backend integration can be found within the front-end. This project
+was done in Angular 10.
 
 ## Development server
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Simply navigate to the head of the repository and run `ng serve` to spin up the application locally.
+Navigate to https://localhost:4200 to see the application running; there should be no compilation errors.
 
 ## Code scaffolding
 
